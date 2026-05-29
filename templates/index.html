@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .home-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 24px;
+    }
+    .property-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .property-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.08);
+        border-color: rgba(139, 92, 246, 0.3);
+    }
+    .property-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--text-main);
+    }
+    .meta-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+    .price-highlight {
+        color: var(--primary-purple);
+        font-weight: 700;
+    }
+</style>
+
+<h2 class="home-title">Available Homestays</h2>
+<div class="grid">
+    {% for p in properties %}
+    <div class="card property-card">
+        <div>
+            <h3>{{ p.title }}</h3>
+            <div class="meta-line"><span>📍</span> {{ p.location }}</div>
+            <div class="meta-line"><span>💰</span> <span class="price-highlight">₹{{ p.price }}</span> / night</div>
+            <div class="meta-line"><span>👥</span> Capacity: {{ p.capacity }} guests</div>
+        </div>
+        <div style="margin-top: 20px;">
+            <a href="/property/{{ p.id }}" class="btn" style="width: 100%;">View Details</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
+        <p style="font-size: 1.1rem;">No properties available yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

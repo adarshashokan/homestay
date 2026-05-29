@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Book a Stay{% endblock %}
+{% block content %}
+<div class="container" style="max-width:600px;">
+    <h2 style="color:#1a3c34; margin-bottom:30px;">Book a Property</h2>
+    <div style="background:white; padding:30px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600; color:#1a3c34;">Property ID</label>
+            <input id="property-id" type="number" style="width:100%; padding:10px; margin-top:6px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600; color:#1a3c34;">Check-in Date</label>
+            <input id="check-in" type="date" style="width:100%; padding:10px; margin-top:6px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div style="margin-bottom:24px;">
+            <label style="font-weight:600; color:#1a3c34;">Check-out Date</label>
+            <input id="check-out" type="date" style="width:100%; padding:10px; margin-top:6px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <button class="btn btn-primary" style="width:100%; padding:14px;" onclick="makeBooking()">Confirm Booking</button>
+    </div>
+
+    <h3 style="color:#1a3c34; margin:40px 0 20px;">My Bookings</h3>
+    <div id="my-bookings"></div>
+</div>
+
+<script>
+    // Auto-fill property ID from URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('property_id')) {
+        document.getElementById('property-id').value = params.get('property_id');
+    }
+
+    function makeBooking() {
+        const token = localStorage.getItem('token');
+        if (!token) { alert('Please login first'); return; }
+        fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                property_id: parseInt(document.getElementById('property-id').value),
+                check_in: document.getElementById('check-in').value,
+                check_out: document.getElementById('check-out').value
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(data.message || data.error);
+            loadMyBookings();
+        });
+    }
+
+    function loadMyBookings() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        fetch('/api/bookings', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const container = document.getElementById('my-bookings');
+            if (data.length === 0) {
+                container.innerHTML = '<p style="color:#888;">No bookings yet.</p>';
+                return;
+            }
+            container.innerHTML = '';
+            data.forEach(b => {
+                container.innerHTML += `
+                <div style="background:white; padding:16px; border-radius:8px; margin-bottom:12px; box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+                    <strong style="color:#1a3c34;">Property #${b.property_id}</strong>
+                    <p style="color:#666; font-size:13px; margin-top:4px;">${b.check_in} → ${b.check_out}</p>
+                    <span style="background:#e8f4ec; color:#2d5a4a; padding:3px 10px; border-radius:20px; font-size:12px;">${b.status}</span>
+                </div>`;
+            });
+        });
+    }
+
+    loadMyBookings();
+</script>
+{% endblock %}

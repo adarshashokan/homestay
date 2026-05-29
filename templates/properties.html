@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Properties{% endblock %}
+{% block content %}
+<div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h2 style="color:#1a3c34;">All Properties</h2>
+        <button class="btn btn-primary" onclick="showAddProperty()">+ Add Property</button>
+    </div>
+
+    <div id="properties-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:24px;"></div>
+</div>
+
+<!-- Add Property Modal -->
+<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
+    <div style="background:white; max-width:500px; margin:80px auto; padding:30px; border-radius:12px;">
+        <h3 style="margin-bottom:20px; color:#1a3c34;">Add New Property</h3>
+        <input id="p-title" placeholder="Property Title" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #ddd; border-radius:6px;"><br>
+        <textarea id="p-desc" placeholder="Description" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #ddd; border-radius:6px; height:80px;"></textarea>
+        <input id="p-price" type="number" placeholder="Price per night (₹)" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:6px;"><br>
+        <button class="btn btn-primary" onclick="addProperty()">Add Property</button>
+        <button class="btn" onclick="document.getElementById('modal').style.display='none'" style="margin-left:10px; background:#eee;">Cancel</button>
+    </div>
+</div>
+
+<script>
+function loadProperties() {
+    fetch('/api/properties')
+        .then(r => r.json())
+        .then(data => {
+            const container = document.getElementById('properties-list');
+            if (data.length === 0) {
+                container.innerHTML = '<p style="color:#888;">No properties yet. Add one!</p>';
+                return;
+            }
+            container.innerHTML = '';
+            data.forEach(p => {
+                container.innerHTML += `
+                <div style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                    <div style="background:#2d5a4a; height:160px; display:flex; align-items:center; justify-content:center; color:#d4a853; font-size:48px;">🏡</div>
+                    <div style="padding:16px;">
+                        <h3 style="color:#1a3c34; margin-bottom:8px;">${p.title}</h3>
+                        <p style="color:#666; font-size:13px; margin-bottom:12px;">${p.description || ''}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:#d4a853; font-weight:700;">₹${p.price_per_night}/night</span>
+                            <a href="/booking?property_id=${p.id}"><button class="btn btn-primary">Book</button></a>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        });
+}
+
+function showAddProperty() {
+    const token = localStorage.getItem('token');
+    if (!token) { alert('Please login first'); return; }
+    document.getElementById('modal').style.display = 'block';
+}
+
+function addProperty() {
+    const token = localStorage.getItem('token');
+    fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            title: document.getElementById('p-title').value,
+            description: document.getElementById('p-desc').value,
+            price_per_night: parseFloat(document.getElementById('p-price').value)
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert(data.message || data.error);
+        document.getElementById('modal').style.display = 'none';
+        loadProperties();
+    });
+}
+
+loadProperties();
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestay Booking</title>
+    <style>
+        :root {
+            --bg-color: #f7f5fa;
+            --nav-bg: #4a3e56;
+            --brand-color: #d1b3ff;
+            --card-bg: #ffffff;
+            --border-color: #e2daeb;
+            --text-main: #2d2533;
+            --text-muted: #736780;
+            --primary-purple: #8b5cf6;
+            --primary-light: #f3eefc;
+            --primary-hover: #7c3aed;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --success-text: #065f46;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --danger-text: #991b1b;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+        
+        nav { 
+            background: var(--nav-bg); 
+            padding: 18px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 12px rgba(74, 62, 86, 0.15);
+        }
+        
+        nav a { 
+            color: #ece6f2; 
+            text-decoration: none; 
+            margin-left: 24px; 
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        nav a:hover {
+            color: var(--brand-color);
+        }
+        
+        nav .brand { 
+            color: var(--brand-color); 
+            font-size: 22px; 
+            font-weight: 700; 
+            letter-spacing: -0.02em;
+        }
+        
+        .container { 
+            max-width: 1140px; 
+            margin: 40px auto; 
+            padding: 0 20px; 
+        }
+        
+        /* Layout Blocks */
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 24px; 
+            margin-bottom: 24px; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.04); 
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 24px; 
+        }
+        
+        /* Global Form Fields */
+        label { 
+            font-weight: 600; 
+            color: var(--text-main); 
+            font-size: 0.9rem;
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+        
+        input, textarea, select { 
+            width: 100%; 
+            padding: 11px 14px; 
+            margin-bottom: 4px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            background-color: #faf9fc;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+        }
+        
+        /* Universal Buttons */
+        .btn { 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-purple); 
+            color: white; 
+            padding: 11px 22px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-decoration: none; 
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-1px);
+        }
+        
+        .btn-green { background: var(--success); }
+        .btn-green:hover { background: #059669; }
+        
+        .btn-red { background: var(--danger); }
+        .btn-red:hover { background: #dc2626; }
+        
+        /* Notification Flash Modals */
+        .flash { 
+            background: var(--success-light); 
+            color: var(--success-text); 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            margin-bottom: 24px; 
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/" class="brand">🏡 Homestay</a>
+    <div>
+        <a href="/">Home</a>
+        {% if session.user_id %}
+            <a href="/my-bookings">My Bookings</a>
+            {% if session.role == 'admin' %}
+                <a href="/admin">Admin</a>
+            {% endif %}
+            <a href="/logout">Logout ({{session.name}})</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
+</nav>
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>
