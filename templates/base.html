@@ -3,183 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homestay Booking</title>
+    <title>{% block title %}Homestay{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f7f5fa;
-            --nav-bg: #4a3e56;
-            --brand-color: #d1b3ff;
-            --card-bg: #ffffff;
-            --border-color: #e2daeb;
-            --text-main: #2d2533;
-            --text-muted: #736780;
-            --primary-purple: #8b5cf6;
-            --primary-light: #f3eefc;
-            --primary-hover: #7c3aed;
-            --success: #10b981;
-            --success-light: #ecfdf5;
-            --success-text: #065f46;
-            --danger: #ef4444;
-            --danger-light: #fef2f2;
-            --danger-text: #991b1b;
+            --forest:    #0f2318;
+            --forest-mid:#1a3c2a;
+            --forest-light:#2d6648;
+            --gold:      #c9a84c;
+            --gold-light:#e2c46e;
+            --cream:     #f8f3ea;
+            --warm-white:#fdfaf4;
+            --charcoal:  #1e1e1e;
+            --muted:     #7a7a6e;
+            --border:    #e0d8c8;
+            --success:   #2d6648;
+            --error:     #b94040;
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
-        
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-color); 
-            color: var(--text-main);
-            line-height: 1.5;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        
-        nav { 
-            background: var(--nav-bg); 
-            padding: 18px 30px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 4px 12px rgba(74, 62, 86, 0.15);
+
+        /* ── NAVBAR ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 500;
+            background: var(--forest);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
         }
-        
-        nav a { 
-            color: #ece6f2; 
-            text-decoration: none; 
-            margin-left: 24px; 
-            font-size: 0.95rem;
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: var(--gold);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .nav-logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--cream);
+            letter-spacing: 0.5px;
+        }
+        .nav-logo-text span { color: var(--gold); }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-links a {
+            color: rgba(248,243,234,0.75);
+            text-decoration: none;
+            font-size: 13px;
             font-weight: 500;
-            transition: color 0.2s ease;
+            letter-spacing: 0.5px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
         }
-        
-        nav a:hover {
-            color: var(--brand-color);
+        .nav-links a:hover { color: var(--cream); background: rgba(255,255,255,0.07); }
+        .nav-links .nav-divider {
+            width: 1px; height: 20px;
+            background: rgba(255,255,255,0.12);
+            margin: 0 6px;
         }
-        
-        nav .brand { 
-            color: var(--brand-color); 
-            font-size: 22px; 
-            font-weight: 700; 
-            letter-spacing: -0.02em;
+        .nav-btn {
+            background: var(--gold) !important;
+            color: var(--forest) !important;
+            font-weight: 600 !important;
+            padding: 8px 18px !important;
         }
-        
-        .container { 
-            max-width: 1140px; 
-            margin: 40px auto; 
-            padding: 0 20px; 
-        }
-        
-        /* Layout Blocks */
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 24px; 
-            margin-bottom: 24px; 
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.04); 
-        }
-        
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 24px; 
-        }
-        
-        /* Global Form Fields */
-        label { 
-            font-weight: 600; 
-            color: var(--text-main); 
-            font-size: 0.9rem;
-            display: block;
-            margin-top: 12px;
-            margin-bottom: 6px;
-        }
-        
-        input, textarea, select { 
-            width: 100%; 
-            padding: 11px 14px; 
-            margin-bottom: 4px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            background-color: #faf9fc;
-            font-size: 0.95rem;
-            color: var(--text-main);
-            transition: all 0.2s ease;
+        .nav-btn:hover { background: var(--gold-light) !important; }
+        .nav-admin {
+            background: rgba(201,168,76,0.15) !important;
+            color: var(--gold) !important;
+            border: 1px solid rgba(201,168,76,0.3) !important;
         }
 
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-purple);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+        /* ── MAIN CONTENT ── */
+        main { flex: 1; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--forest);
+            border-top: 1px solid rgba(201,168,76,0.15);
+            padding: 28px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        
-        /* Universal Buttons */
-        .btn { 
+        .footer-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 17px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: rgba(248,243,234,0.4);
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── MODAL OVERLAY ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,35,24,0.75);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp {
+            from { transform: translateY(24px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        .modal {
+            background: var(--warm-white);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .modal-header {
+            background: var(--forest);
+            padding: 28px 32px 24px;
+            position: relative;
+        }
+        .modal-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--cream);
+        }
+        .modal-header p {
+            font-size: 13px;
+            color: rgba(248,243,234,0.55);
+            margin-top: 4px;
+        }
+        .modal-header .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--cream);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+        .modal-body { padding: 28px 32px 32px; }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Jost', sans-serif;
+            color: var(--charcoal);
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: var(--forest-light);
+            box-shadow: 0 0 0 3px rgba(45,102,72,0.12);
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: var(--primary-purple); 
-            color: white; 
-            padding: 11px 22px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            text-decoration: none; 
+            gap: 8px;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-family: 'Jost', sans-serif;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
         }
+        .btn-full { width: 100%; }
+        .btn-primary {
+            background: var(--forest);
+            color: var(--cream);
+        }
+        .btn-primary:hover { background: var(--forest-mid); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(15,35,24,0.25); }
+        .btn-gold {
+            background: var(--gold);
+            color: var(--forest);
+        }
+        .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1.5px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: var(--charcoal); color: var(--charcoal); }
 
-        .btn:hover { 
-            background: var(--primary-hover); 
-            transform: translateY(-1px);
+        .modal-footer-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--muted);
         }
-        
-        .btn-green { background: var(--success); }
-        .btn-green:hover { background: #059669; }
-        
-        .btn-red { background: var(--danger); }
-        .btn-red:hover { background: #dc2626; }
-        
-        /* Notification Flash Modals */
-        .flash { 
-            background: var(--success-light); 
-            color: var(--success-text); 
-            padding: 12px 16px; 
-            border-radius: 8px; 
-            margin-bottom: 24px; 
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            font-size: 0.95rem;
-            font-weight: 500;
+        .modal-footer-link a {
+            color: var(--forest-light);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
         }
+        .modal-footer-link a:hover { text-decoration: underline; }
+
+        /* Alert messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .alert.show { display: flex; }
+        .alert-success {
+            background: #eaf6ee;
+            color: var(--success);
+            border: 1px solid #b8e4c5;
+        }
+        .alert-error {
+            background: #fceaea;
+            color: var(--error);
+            border: 1px solid #f0bfbf;
+        }
+        .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+        /* ── UTILITIES ── */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* Buttons used in pages */
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: 8px;
+            font-family: 'Jost', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .page-btn-primary {
+            background: var(--forest);
+            color: var(--cream);
+        }
+        .page-btn-primary:hover { background: var(--forest-mid); transform: translateY(-1px); }
+        .page-btn-gold {
+            background: var(--gold);
+            color: var(--forest);
+        }
+        .page-btn-gold:hover { background: var(--gold-light); }
+
+        /* Loader spinner */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+<!-- ── NAVBAR ── -->
 <nav>
-    <a href="/" class="brand">🏡 Homestay</a>
-    <div>
+    <a href="/" class="nav-logo">
+        <div class="nav-logo-icon">🏡</div>
+        <span class="nav-logo-text">Home<span>stay</span></span>
+    </a>
+    <div class="nav-links">
         <a href="/">Home</a>
-        {% if session.user_id %}
-            <a href="/my-bookings">My Bookings</a>
-            {% if session.role == 'admin' %}
-                <a href="/admin">Admin</a>
-            {% endif %}
-            <a href="/logout">Logout ({{session.name}})</a>
-        {% else %}
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-        {% endif %}
+        <a href="/properties">Properties</a>
+        <a href="/booking">Bookings</a>
+        <div class="nav-divider"></div>
+        <span id="auth-links">
+            <a onclick="openLogin()">Sign In</a>
+            <a onclick="openRegister()" class="nav-btn">Get Started</a>
+        </span>
+        <a onclick="logout()" id="logout-btn" style="display:none">Sign Out</a>
+        <a href="/admin" id="admin-link" class="nav-admin" style="display:none">⚙ Admin</a>
     </div>
 </nav>
-<div class="container">
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                <div class="flash">{{ msg }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+
+<!-- ── MAIN CONTENT ── -->
+<main>
+{% block content %}
+{% endblock %}
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="footer-brand">🏡 Homestay</div>
+    <div class="footer-text">DEVSECOPS CAPSTONE · IPSR SOLUTIONS · 2026</div>
+</footer>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Welcome back</h2>
+            <p>Sign in to your Homestay account</p>
+            <button class="modal-close" onclick="closeLogin()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-success" id="login-success">
+                <span class="alert-icon">✓</span>
+                <span id="login-success-text"></span>
+            </div>
+            <div class="alert alert-error" id="login-error">
+                <span class="alert-icon">!</span>
+                <span id="login-error-text"></span>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="doLogin()" id="login-btn">
+                <span>Sign In</span>
+                <div class="spinner" id="login-spinner"></div>
+            </button>
+            <div class="modal-footer-link">
+                No account? <a onclick="closeLogin(); openRegister()">Create one free</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- ── REGISTER MODAL ── -->
+<div class="modal-overlay" id="registerModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Create account</h2>
+            <p>Join Homestay and start exploring</p>
+            <button class="modal-close" onclick="closeRegister()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-success" id="register-success">
+                <span class="alert-icon">✓</span>
+                <span id="register-success-text"></span>
+            </div>
+            <div class="alert alert-error" id="register-error">
+                <span class="alert-icon">!</span>
+                <span id="register-error-text"></span>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="register-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="register-password" placeholder="Minimum 8 characters" autocomplete="new-password">
+            </div>
+            <button class="btn btn-gold btn-full" onclick="doRegister()" id="register-btn">
+                <span>Create Account</span>
+                <div class="spinner" id="register-spinner"></div>
+            </button>
+            <div class="modal-footer-link">
+                Already have an account? <a onclick="closeRegister(); openLogin()">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── AUTH STATE ──
+    window.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('token');
+        const role  = localStorage.getItem('role');
+        if (token) {
+            document.getElementById('auth-links').style.display  = 'none';
+            document.getElementById('logout-btn').style.display  = 'inline';
+            if (role === 'admin') {
+                document.getElementById('admin-link').style.display = 'inline';
+            }
+        }
+    });
+
+    // ── MODAL HELPERS ──
+    function openLogin()     { document.getElementById('loginModal').classList.add('active'); setTimeout(() => document.getElementById('login-email').focus(), 100); }
+    function closeLogin()    { document.getElementById('loginModal').classList.remove('active'); clearAlerts('login'); }
+    function openRegister()  { document.getElementById('registerModal').classList.add('active'); setTimeout(() => document.getElementById('register-email').focus(), 100); }
+    function closeRegister() { document.getElementById('registerModal').classList.remove('active'); clearAlerts('register'); }
+
+    // Close on overlay click
+    document.getElementById('loginModal').addEventListener('click',    e => { if (e.target === document.getElementById('loginModal'))    closeLogin(); });
+    document.getElementById('registerModal').addEventListener('click', e => { if (e.target === document.getElementById('registerModal')) closeRegister(); });
+
+    // Enter key
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        if (document.getElementById('loginModal').classList.contains('active'))    doLogin();
+        if (document.getElementById('registerModal').classList.contains('active')) doRegister();
+    });
+
+    function clearAlerts(prefix) {
+        document.getElementById(prefix + '-success').classList.remove('show');
+        document.getElementById(prefix + '-error').classList.remove('show');
+    }
+    function showAlert(prefix, type, msg) {
+        clearAlerts(prefix);
+        document.getElementById(prefix + '-' + type).classList.add('show');
+        document.getElementById(prefix + '-' + type + '-text').textContent = msg;
+    }
+    function setLoading(prefix, loading) {
+        document.getElementById(prefix + '-btn').disabled = loading;
+        document.getElementById(prefix + '-spinner').style.display = loading ? 'block' : 'none';
+    }
+
+    // ── LOGIN ──
+    function doLogin() {
+        const email    = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        if (!email || !password) { showAlert('login','error','Please fill in all fields.'); return; }
+        setLoading('login', true);
+        fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+        .then(r => r.json())
+        .then(data => {
+            setLoading('login', false);
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('role', data.role || 'user');
+                showAlert('login','success','Login successful! Redirecting…');
+                setTimeout(() => { closeLogin(); window.location.reload(); }, 1200);
+            } else {
+                showAlert('login','error', data.error || 'Invalid credentials.');
+            }
+        })
+        .catch(() => { setLoading('login', false); showAlert('login','error','Network error. Please try again.'); });
+    }
+
+    // ── REGISTER ──
+    function doRegister() {
+        const email    = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        if (!email || !password) { showAlert('register','error','Please fill in all fields.'); return; }
+        if (password.length < 8)  { showAlert('register','error','Password must be at least 8 characters.'); return; }
+        setLoading('register', true);
+        fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+        .then(r => r.json())
+        .then(data => {
+            setLoading('register', false);
+            if (data.message) {
+                showAlert('register','success','Account created! Taking you to login…');
+                setTimeout(() => { closeRegister(); openLogin(); }, 1500);
+            } else {
+                showAlert('register','error', data.error || 'Registration failed.');
+            }
+        })
+        .catch(() => { setLoading('register', false); showAlert('register','error','Network error. Please try again.'); });
+    }
+
+    // ── LOGOUT ──
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        window.location.href = '/';
+    }
+</script>
+
 </body>
 </html>

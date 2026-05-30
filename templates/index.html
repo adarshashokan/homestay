@@ -1,61 +1,117 @@
 {% extends 'base.html' %}
+{% block title %}Homestay — Find Your Perfect Stay{% endblock %}
 {% block content %}
 <style>
-    .home-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-main);
-        margin-bottom: 24px;
-    }
-    .property-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    .property-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.08);
-        border-color: rgba(139, 92, 246, 0.3);
-    }
-    .property-card h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: var(--text-main);
-    }
-    .meta-line {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-        color: var(--text-muted);
-        font-size: 0.95rem;
-    }
-    .price-highlight {
-        color: var(--primary-purple);
-        font-weight: 700;
-    }
+.hero { background: #0f2318; padding: 80px 40px; text-align: center; position: relative; }
+.hero h1 { font-family: "Cormorant Garamond", serif; font-size: 60px; color: #f8f3ea; line-height: 1.1; }
+.hero h1 em { color: #c9a84c; font-style: italic; }
+.hero p { color: rgba(248,243,234,0.6); font-size: 16px; margin: 16px auto; max-width: 480px; line-height: 1.7; }
+.hero-actions { display: flex; gap: 14px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+.hero-btn { background: #c9a84c; color: #0f2318; padding: 14px 32px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 15px; }
+.hero-btn-ghost { background: transparent; color: #f8f3ea; padding: 13px 32px; border-radius: 8px; font-weight: 500; border: 1.5px solid rgba(248,243,234,0.3); cursor: pointer; font-size: 15px; }
+.section { padding: 64px 0; background: #fdfaf4; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.section-header { text-align: center; margin-bottom: 44px; }
+.section-tag { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; font-family: "DM Mono", monospace; margin-bottom: 10px; }
+.section-title { font-family: "Cormorant Garamond", serif; font-size: 38px; color: #0f2318; font-weight: 600; }
+.prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+.prop-card { background: #fff; border-radius: 14px; overflow: hidden; border: 1px solid #e0d8c8; transition: transform 0.25s, box-shadow 0.25s; }
+.prop-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+.prop-img { height: 190px; background: linear-gradient(135deg, #0f2318, #2d6648); display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; }
+.prop-badge { position: absolute; top: 12px; left: 12px; background: #c9a84c; color: #0f2318; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; font-family: "DM Mono", monospace; }
+.prop-body { padding: 20px; }
+.prop-title { font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 600; color: #0f2318; margin-bottom: 8px; }
+.prop-desc { font-size: 13px; color: #7a7a6e; line-height: 1.6; margin-bottom: 16px; }
+.prop-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #e0d8c8; }
+.prop-price { font-family: "Cormorant Garamond", serif; font-size: 22px; font-weight: 700; color: #c9a84c; }
+.prop-price span { font-family: "Jost", sans-serif; font-size: 12px; color: #7a7a6e; font-weight: 400; }
+.prop-btn { background: #0f2318; color: #f8f3ea; padding: 9px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; }
+.stats-bar { background: #1a3c2a; padding: 20px 40px; display: flex; justify-content: center; gap: 0; border-bottom: 1px solid rgba(201,168,76,0.1); }
+.stat-item { text-align: center; padding: 0 36px; border-right: 1px solid rgba(255,255,255,0.08); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: "Cormorant Garamond", serif; font-size: 28px; font-weight: 700; color: #c9a84c; }
+.stat-label { font-size: 10px; color: rgba(248,243,234,0.45); letter-spacing: 1px; text-transform: uppercase; font-family: "DM Mono", monospace; margin-top: 3px; }
+.features { padding: 64px 0; background: #f8f3ea; }
+.feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.feat-card { background: #fff; border: 1px solid #e0d8c8; border-radius: 12px; padding: 26px 22px; }
+.feat-icon { font-size: 30px; margin-bottom: 12px; }
+.feat-title { font-family: "Cormorant Garamond", serif; font-size: 18px; font-weight: 600; color: #0f2318; margin-bottom: 8px; }
+.feat-text { font-size: 13px; color: #7a7a6e; line-height: 1.6; }
+.empty { text-align: center; padding: 48px; color: #7a7a6e; grid-column: 1/-1; }
 </style>
 
-<h2 class="home-title">Available Homestays</h2>
-<div class="grid">
-    {% for p in properties %}
-    <div class="card property-card">
-        <div>
-            <h3>{{ p.title }}</h3>
-            <div class="meta-line"><span>📍</span> {{ p.location }}</div>
-            <div class="meta-line"><span>💰</span> <span class="price-highlight">₹{{ p.price }}</span> / night</div>
-            <div class="meta-line"><span>👥</span> Capacity: {{ p.capacity }} guests</div>
-        </div>
-        <div style="margin-top: 20px;">
-            <a href="/property/{{ p.id }}" class="btn" style="width: 100%;">View Details</a>
-        </div>
+<section class="hero">
+    <div style="display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);padding:6px 16px;border-radius:20px;margin-bottom:22px;">Kerala Finest Homestays</div>
+    <h1>Discover Your Perfect<br><em>Home Away From Home</em></h1>
+    <p>Handpicked homestays hosted by warm local families across the beautiful landscapes of Kerala.</p>
+    <div class="hero-actions">
+        <a href="/properties" class="hero-btn">Browse Properties</a>
+        <button class="hero-btn-ghost" onclick="openRegister()">Join Free →</button>
     </div>
-    {% else %}
-    <div class="card" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
-        <p style="font-size: 1.1rem;">No properties available yet.</p>
-    </div>
-    {% endfor %}
+</section>
+
+<div class="stats-bar">
+    <div class="stat-item"><div class="stat-num" id="stat-props">—</div><div class="stat-label">Properties</div></div>
+    <div class="stat-item"><div class="stat-num">Kerala</div><div class="stat-label">Location</div></div>
+    <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Support</div></div>
+    <div class="stat-item"><div class="stat-num">AWS</div><div class="stat-label">Powered</div></div>
 </div>
+
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-tag">Featured</div>
+            <div class="section-title">Available Homestays</div>
+        </div>
+        <div class="prop-grid" id="prop-grid">
+            <div class="empty">Loading properties…</div>
+        </div>
+        <div style="text-align:center;margin-top:36px;">
+            <a href="/properties" class="hero-btn" style="display:inline-block;text-decoration:none;">View All →</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-tag">Why Choose Us</div>
+            <div class="section-title">The Homestay Difference</div>
+        </div>
+        <div class="feat-grid">
+            <div class="feat-card"><div class="feat-icon">🔐</div><div class="feat-title">Secure Booking</div><div class="feat-text">JWT authentication with bcrypt encryption keeps your data safe at all times.</div></div>
+            <div class="feat-card"><div class="feat-icon">🏡</div><div class="feat-title">Verified Hosts</div><div class="feat-text">Every property is listed by verified local hosts offering authentic Kerala hospitality.</div></div>
+            <div class="feat-card"><div class="feat-icon">📅</div><div class="feat-title">Instant Booking</div><div class="feat-text">Real-time availability checks confirm your dates instantly without any hassle.</div></div>
+            <div class="feat-card"><div class="feat-icon">☁️</div><div class="feat-title">AWS Powered</div><div class="feat-text">Hosted on AWS with CloudWatch monitoring and 99.9% uptime guarantee.</div></div>
+        </div>
+    </div>
+</section>
+
+<script>
+const emojis = ["🏡","🌿","🌴","🏞️","🌺","🏘️"];
+fetch("/api/properties")
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById("stat-props").textContent = data.length || "0";
+        const grid = document.getElementById("prop-grid");
+        if (!data.length) {
+            grid.innerHTML = "<div class=\"empty\">No properties yet. <a onclick=\"openRegister()\" style=\"color:#2d6648;cursor:pointer;font-weight:600;\">Register</a> to add one!</div>";
+            return;
+        }
+        grid.innerHTML = "";
+        data.slice(0,6).forEach((p,i) => {
+            grid.innerHTML += `<div class="prop-card">
+                <div class="prop-img"><span>${emojis[i%emojis.length]}</span><div class="prop-badge">AVAILABLE</div></div>
+                <div class="prop-body">
+                    <div class="prop-title">${p.title}</div>
+                    <div class="prop-desc">${p.description || "A beautiful homestay experience awaits."}</div>
+                    <div class="prop-footer">
+                        <div class="prop-price">₹${p.price_per_night.toLocaleString()} <span>/ night</span></div>
+                        <a href="/booking?property_id=${p.id}" class="prop-btn">Book Now</a>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+</script>
 {% endblock %}

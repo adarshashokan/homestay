@@ -1,82 +1,263 @@
 {% extends 'base.html' %}
 {% block title %}Book a Stay{% endblock %}
 {% block content %}
-<div class="container" style="max-width:600px;">
-    <h2 style="color:#1a3c34; margin-bottom:30px;">Book a Property</h2>
-    <div style="background:white; padding:30px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-        <div style="margin-bottom:16px;">
-            <label style="font-weight:600; color:#1a3c34;">Property ID</label>
-            <input id="property-id" type="number" style="width:100%; padding:10px; margin-top:6px; border:1px solid #ddd; border-radius:6px;">
-        </div>
-        <div style="margin-bottom:16px;">
-            <label style="font-weight:600; color:#1a3c34;">Check-in Date</label>
-            <input id="check-in" type="date" style="width:100%; padding:10px; margin-top:6px; border:1px solid #ddd; border-radius:6px;">
-        </div>
-        <div style="margin-bottom:24px;">
-            <label style="font-weight:600; color:#1a3c34;">Check-out Date</label>
-            <input id="check-out" type="date" style="width:100%; padding:10px; margin-top:6px; border:1px solid #ddd; border-radius:6px;">
-        </div>
-        <button class="btn btn-primary" style="width:100%; padding:14px;" onclick="makeBooking()">Confirm Booking</button>
-    </div>
+<style>
+.booking-wrap { max-width: 900px; margin: 48px auto; padding: 0 24px; }
+.page-title { font-family: "Cormorant Garamond", serif; font-size: 38px; color: #0f2318; font-weight: 600; margin-bottom: 8px; }
+.page-sub { color: #7a7a6e; font-size: 14px; margin-bottom: 36px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.card { background: #fff; border-radius: 14px; border: 1px solid #e0d8c8; overflow: hidden; }
+.card-header { background: #0f2318; padding: 18px 24px; }
+.card-header h3 { color: #f8f3ea; font-family: "Cormorant Garamond", serif; font-size: 22px; font-weight: 600; }
+.card-header p { color: rgba(248,243,234,0.5); font-size: 13px; margin-top: 3px; }
+.card-body { padding: 24px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #7a7a6e; margin-bottom: 6px; }
+.form-group input, .form-group select { width: 100%; padding: 12px 14px; border: 1.5px solid #e0d8c8; border-radius: 8px; font-family: "Jost", sans-serif; font-size: 14px; outline: none; background: #fff; }
+.form-group input:focus, .form-group select:focus { border-color: #0f2318; }
+.submit-btn { width: 100%; padding: 14px; background: #0f2318; color: #f8f3ea; border: none; border-radius: 8px; font-family: "Jost", sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; }
+.submit-btn:hover { background: #1a3c2a; }
+.login-prompt { text-align: center; padding: 32px 24px; }
+.login-prompt p { color: #7a7a6e; margin-bottom: 16px; font-size: 14px; }
+.login-prompt button { background: #0f2318; color: #f8f3ea; border: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+.msg { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+.msg.show { display: block; }
+.msg-success { background: #e8f4ec; color: #2d6648; border: 1px solid #b8e4c5; }
+.msg-error { background: #fceaea; color: #b94040; border: 1px solid #f0bfbf; }
+.booking-item { padding: 16px 20px; border-bottom: 1px solid #f0ebe0; }
+.booking-item:last-child { border-bottom: none; }
+.booking-item h4 { font-family: "Cormorant Garamond", serif; font-size: 17px; color: #0f2318; font-weight: 600; }
+.booking-item p { font-size: 12px; color: #7a7a6e; margin-top: 4px; }
+.booking-item .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #e8f4ec; color: #2d6648; }
+.price-tag { font-size: 13px; color: #c9a84c; font-weight: 600; }
+.empty { text-align: center; padding: 36px; color: #7a7a6e; font-size: 14px; }
+.price-summary { background: #f8f3ea; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; display: none; }
+.price-row { display: flex; justify-content: space-between; font-size: 13px; color: #7a7a6e; margin-bottom: 6px; }
+.price-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: #0f2318; border-top: 1px solid #e0d8c8; padding-top: 8px; margin-top: 4px; }
+.price-total span:last-child { color: #c9a84c; }
+@media(max-width:700px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
 
-    <h3 style="color:#1a3c34; margin:40px 0 20px;">My Bookings</h3>
-    <div id="my-bookings"></div>
+<div class="booking-wrap">
+    <div class="page-title">Book a Homestay</div>
+    <p class="page-sub">Choose your property and dates to confirm your stay.</p>
+    <div class="grid-2">
+
+        <!-- LEFT: Booking Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3>New Booking</h3>
+                <p>Fill in your stay details</p>
+            </div>
+            <div id="booking-form-area">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <!-- RIGHT: My Bookings -->
+        <div class="card">
+            <div class="card-header">
+                <h3>My Bookings</h3>
+                <p>Your upcoming and past stays</p>
+            </div>
+            <div id="my-bookings-area">
+                <div class="empty">Loading…</div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script>
-    // Auto-fill property ID from URL
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('property_id')) {
-        document.getElementById('property-id').value = params.get('property_id');
-    }
+const token = localStorage.getItem("token");
+const role  = localStorage.getItem("role");
+let allProps = [];
 
-    function makeBooking() {
-        const token = localStorage.getItem('token');
-        if (!token) { alert('Please login first'); return; }
-        fetch('/api/bookings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                property_id: parseInt(document.getElementById('property-id').value),
-                check_in: document.getElementById('check-in').value,
-                check_out: document.getElementById('check-out').value
-            })
-        })
+// ── RENDER BOOKING FORM ──
+function renderForm() {
+    const area = document.getElementById("booking-form-area");
+    if (!token) {
+        area.innerHTML = `<div class="login-prompt">
+            <p>Please login to make a booking.</p>
+            <button onclick="openLogin()">Sign In to Book</button>
+        </div>`;
+        return;
+    }
+    area.innerHTML = `
+        <div class="card-body">
+            <div class="msg msg-success" id="book-success">✓ Booking confirmed successfully!</div>
+            <div class="msg msg-error"   id="book-error"></div>
+            <div class="form-group">
+                <label>Select Property</label>
+                <select id="prop-select" onchange="onPropSelect()">
+                    <option value="">— Choose a property —</option>
+                </select>
+            </div>
+            <div id="prop-info" style="background:#f8f3ea;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#2d6648;display:none;"></div>
+            <div class="form-group">
+                <label>Check-in Date</label>
+                <input type="date" id="check-in" onchange="onDateChange()">
+            </div>
+            <div class="form-group">
+                <label>Check-out Date</label>
+                <input type="date" id="check-out" onchange="calcPrice()">
+            </div>
+            <div class="price-summary" id="price-summary">
+                <div class="price-row"><span>Price per night</span><span id="pn">—</span></div>
+                <div class="price-row"><span>Number of nights</span><span id="nn">—</span></div>
+                <div class="price-total"><span>Total</span><span id="tp">—</span></div>
+            </div>
+            <button class="submit-btn" onclick="makeBooking()">Confirm Booking</button>
+        </div>`;
+
+    // Set min date
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("check-in").min  = today;
+    document.getElementById("check-out").min = today;
+
+    // Load properties
+    fetch("/api/properties")
         .then(r => r.json())
         .then(data => {
-            alert(data.message || data.error);
-            loadMyBookings();
-        });
-    }
-
-    function loadMyBookings() {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        fetch('/api/bookings', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        })
-        .then(r => r.json())
-        .then(data => {
-            const container = document.getElementById('my-bookings');
-            if (data.length === 0) {
-                container.innerHTML = '<p style="color:#888;">No bookings yet.</p>';
-                return;
-            }
-            container.innerHTML = '';
-            data.forEach(b => {
-                container.innerHTML += `
-                <div style="background:white; padding:16px; border-radius:8px; margin-bottom:12px; box-shadow:0 1px 6px rgba(0,0,0,0.06);">
-                    <strong style="color:#1a3c34;">Property #${b.property_id}</strong>
-                    <p style="color:#666; font-size:13px; margin-top:4px;">${b.check_in} → ${b.check_out}</p>
-                    <span style="background:#e8f4ec; color:#2d5a4a; padding:3px 10px; border-radius:20px; font-size:12px;">${b.status}</span>
-                </div>`;
+            allProps = data;
+            const sel = document.getElementById("prop-select");
+            data.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = p.title + " — ₹" + p.price_per_night.toLocaleString() + "/night";
+                sel.appendChild(opt);
             });
+            // Auto-select from URL
+            const urlId = new URLSearchParams(window.location.search).get("property_id");
+            if (urlId) { sel.value = urlId; onPropSelect(); }
         });
-    }
+}
 
+function onPropSelect() {
+    const id   = document.getElementById("prop-select").value;
+    const prop = allProps.find(p => p.id == id);
+    const info = document.getElementById("prop-info");
+    if (prop) {
+        info.textContent = "🏡 " + prop.title + (prop.description ? " — " + prop.description : "");
+        info.style.display = "block";
+    } else {
+        info.style.display = "none";
+    }
+    calcPrice();
+}
+
+function onDateChange() {
+    const ci = document.getElementById("check-in").value;
+    document.getElementById("check-out").min = ci;
+    calcPrice();
+}
+
+function calcPrice() {
+    const id  = document.getElementById("prop-select").value;
+    const ci  = document.getElementById("check-in").value;
+    const co  = document.getElementById("check-out").value;
+    const prop = allProps.find(p => p.id == id);
+    const ps  = document.getElementById("price-summary");
+    if (!id || !ci || !co || !prop) { ps.style.display = "none"; return; }
+    const nights = Math.ceil((new Date(co) - new Date(ci)) / 86400000);
+    if (nights <= 0) { ps.style.display = "none"; return; }
+    document.getElementById("pn").textContent = "₹" + prop.price_per_night.toLocaleString();
+    document.getElementById("nn").textContent = nights + " night" + (nights > 1 ? "s" : "");
+    document.getElementById("tp").textContent = "₹" + (prop.price_per_night * nights).toLocaleString();
+    ps.style.display = "block";
+}
+
+function makeBooking() {
+    const propId  = document.getElementById("prop-select").value;
+    const checkIn = document.getElementById("check-in").value;
+    const checkOut= document.getElementById("check-out").value;
+    const errEl   = document.getElementById("book-error");
+    const sucEl   = document.getElementById("book-success");
+    errEl.classList.remove("show");
+    sucEl.classList.remove("show");
+
+    if (!propId)   { errEl.textContent = "Please select a property.";      errEl.classList.add("show"); return; }
+    if (!checkIn)  { errEl.textContent = "Please select check-in date.";   errEl.classList.add("show"); return; }
+    if (!checkOut) { errEl.textContent = "Please select check-out date.";  errEl.classList.add("show"); return; }
+    if (checkIn >= checkOut) { errEl.textContent = "Check-out must be after check-in."; errEl.classList.add("show"); return; }
+
+    fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+            property_id: parseInt(propId),
+            check_in: checkIn,
+            check_out: checkOut
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.message) {
+            sucEl.classList.add("show");
+            document.getElementById("prop-select").value = "";
+            document.getElementById("check-in").value   = "";
+            document.getElementById("check-out").value  = "";
+            document.getElementById("price-summary").style.display = "none";
+            document.getElementById("prop-info").style.display     = "none";
+            loadMyBookings();
+        } else {
+            errEl.textContent = data.error || "Booking failed.";
+            errEl.classList.add("show");
+        }
+    })
+    .catch(e => {
+        errEl.textContent = "Error: " + e.message;
+        errEl.classList.add("show");
+    });
+}
+
+// ── MY BOOKINGS ──
+function loadMyBookings() {
+    const area = document.getElementById("my-bookings-area");
+    if (!token) {
+        area.innerHTML = `<div class="empty">Please <a onclick="openLogin()" style="color:#0f2318;cursor:pointer;font-weight:600;">login</a> to view bookings.</div>`;
+        return;
+    }
+    fetch("/api/bookings", {
+        headers: { "Authorization": "Bearer " + token }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.length) {
+            area.innerHTML = "<div class=\"empty\">No bookings yet.<br>Make your first booking!</div>";
+            return;
+        }
+        area.innerHTML = "";
+        data.forEach(b => {
+            const prop = allProps.find(p => p.id == b.property_id);
+            const name = prop ? prop.title : "Property #" + b.property_id;
+            const nights = prop ? Math.ceil((new Date(b.check_out) - new Date(b.check_in)) / 86400000) : "—";
+            const total  = prop ? "₹" + (prop.price_per_night * nights).toLocaleString() : "";
+            area.innerHTML += `<div class="booking-item">
+                <h4>${name}</h4>
+                <p>📅 ${b.check_in} → ${b.check_out} &nbsp;|&nbsp; ${nights} night${nights > 1 ? "s" : ""}</p>
+                <div class="meta">
+                    <span class="status-badge">${b.status}</span>
+                    <span class="price-tag">${total}</span>
+                </div>
+            </div>`;
+        });
+    })
+    .catch(() => {
+        area.innerHTML = "<div class=\"empty\">Failed to load bookings.</div>";
+    });
+}
+
+// ── INIT ──
+renderForm();
+// Load props first then bookings so names resolve
+fetch("/api/properties").then(r=>r.json()).then(data => {
+    allProps = data;
     loadMyBookings();
+});
 </script>
 {% endblock %}
