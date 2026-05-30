@@ -7,3 +7,5 @@ __pycache__/
 instance/
 .DS_Store
 .github/
+amazon-cloudwatch-agent.deb
+*.deb
